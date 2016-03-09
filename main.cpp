@@ -1,19 +1,15 @@
-#include<iostream>
-#include "lib\ArrayList.hpp"
-#include "util\ListUtil.hpp"
-
 using namespace std;
 
-//int ListUtil::readList(int i)
-//{
-//	return 0;
-//}
+#include<iostream>
+#include "lib\ArrayList.cpp"
+#include "util\ListUtil.cpp"
 
 
 int main()
 {
-	int i;
-	//cout<<ListUtil::readList()3) ;
+	ArrayList a(6);	
+	ListUtil::readList(&a);
+	ListUtil::printList(&a);
 	
 	return 0;
 }

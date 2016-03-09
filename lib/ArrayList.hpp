@@ -11,6 +11,7 @@ class ArrayList
 	public: 
 		ArrayList(int maxLength);
 		bool isEmpty();
+		bool isFull();
 		void clear();
 		void add(int location, int item);
 		void add(int item);

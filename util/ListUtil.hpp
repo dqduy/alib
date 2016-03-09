@@ -1,4 +1,5 @@
-#include "..\lib\ArrayList.hpp"
+#ifndef _ListUtil_H
+#define _ListUtil_H
 
 class ListUtil
 {
@@ -7,5 +8,4 @@ class ListUtil
 		static void printList(ArrayList* list);
 };
 
-
-
+#endif

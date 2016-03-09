@@ -9,20 +9,46 @@ ArrayList::ArrayList(int maxLength)
 
 bool ArrayList::isEmpty()
 {
-	return false;
+	if(cursor == 0) return true;
+	else return false;
+}
+
+bool ArrayList::isFull()
+{
+	if(cursor == maxLength) return true;
+	else return false;
 }
 
 void ArrayList::clear()
 {
-	
+	delete[] list;
+	cursor = 0;
 }
 
 void ArrayList::add(int location, int item)
 {
+	if(!isFull()) 
+	{
+		if(location >= 1 && location <= cursor + 1)
+		{
+			for(int i = cursor; i> location-1; i--)
+			{
+				list[i] = list[i-1];
+			}
+			
+			list[location-1] = item;
+			cursor++;
+		}
+	}
 }
 
 void ArrayList::add(int item)
 {
+	if(!isFull())
+	{
+		list[cursor] = item;
+		cursor++;
+	}
 }
 
 void ArrayList::remove(int location)
@@ -37,10 +63,10 @@ int ArrayList::indexOf(int item)
  
 int ArrayList::get(int location)
 {
-	return 0;
+	return list[location-1];
 } 
 
 int ArrayList::size()
 {
-	return 0;
+	return cursor;
 }
