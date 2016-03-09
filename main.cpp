@@ -7,5 +7,6 @@ int main()
 {
 	int i;
 	cin>>i;
+	ArrayList l(3);
 	return 0;
 }

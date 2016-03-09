@@ -4,10 +4,11 @@ class ArrayList
 	private:
 		int maxLength; //Max item of the list
 		int cursor; //Current cursor 
+		int* list;
 		
 	public: 
 		ArrayList(int maxLength);
-		bool is Empty();
+		bool isEmpty();
 		void clear();
 		void add(int location, int item);
 		void add(int item);
@@ -16,6 +17,4 @@ class ArrayList
 		int get(int location);
 		int size();		
 };
-
-
 
