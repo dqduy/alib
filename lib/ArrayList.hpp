@@ -1,3 +1,5 @@
+#ifndef _ArrayList_H
+#define _ArrayList_H
 
 class ArrayList
 {
@@ -17,4 +19,6 @@ class ArrayList
 		int get(int location);
 		int size();		
 };
+
+#endif
 
