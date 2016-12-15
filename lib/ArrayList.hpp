@@ -21,5 +21,11 @@ class ArrayList
 		int size();		
 };
 
+
+/*
+
+
+*/
+
 #endif
 
