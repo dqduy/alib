@@ -1,8 +1,8 @@
 using namespace std;
 
 #include<iostream>
-#include "lib/ArrayList.h"
-#include "lib/util/ListUtil.h"
+#include "lib/ArrayList.cpp"
+#include "util/ListUtil.cpp"
 
 
 int main()

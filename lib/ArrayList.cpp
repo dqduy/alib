@@ -1,4 +1,4 @@
-#include "ArrayList.hpp"
+#include "ArrayList.h"
 
 ArrayList::ArrayList(int maxLength) 
 {
