@@ -1,4 +1,6 @@
-#include "ListUtil.hpp"
+#include "../ArrayList.h"
+#include "ListUtil.h"
+#include<iostream>
 
 using namespace std;
 
@@ -7,8 +9,8 @@ ArrayList* ListUtil::readList(ArrayList* list)
 	list->add(3);
 	list->add(5);
 	list->add(15);
-	list->add(1, 7);
-	list->add(2, 73);
+	list->add(7);
+	list->add(73);
 	return list;
 }
 
@@ -16,8 +18,10 @@ void ListUtil::printList (ArrayList* list)
 {
 	cout<<"List---"<<endl;
 	
-	for(int i = 1; i <= list->size(); i++)
+	for(int index = 0; index < list->size(); ++index)
 	{
-		cout<< list->get(i) << " ";
+		cout<< list->get(index) << " ";
 	}
+
+        cout << endl;
 }
