@@ -18,7 +18,8 @@ class ArrayList
 		void remove(int location);
 		int indexOf(int item);
 		int get(int location);
-		int size();		
+		int size();	
+                        
 };
 
 #endif
