@@ -1,31 +1,56 @@
 #include "ArrayList.h"
 
-ArrayList::ArrayList(int maxLength) 
+ArrayList::increaseSpace(int space)
 {
-    list = new int[maxLength];
-    this->maxLength = maxLength;
-    this->cursor = 0;
+}
+
+ArrayList::decreaseSpace(int space) 
+{
+}
+
+ArrayList::ArrayList() 
+{
+    capacity    = 20;
+    totalItems  = 0;
+    blockSize   = 124;
+    list = new int[capacity];
+}
+
+ArrayList::ArrayList(int64_t capacity) 
+{
+    this.capacity    = capacity;
+    this.totalItems  = 0;
+    this.blockSize   = 124;
+    list = new int[this.capacity];
+}
+
+ArrayList::ArrayList(ArrayList& obj) 
+{
 }
 
 bool ArrayList::isEmpty()
 {
-    if(cursor == 0) return true;
+    if(totalItems == 0) return true;
     else return false;
 }
 
 bool ArrayList::isFull()
 {
-    if(cursor == maxLength) return true;
+    if(totalItems == capacity) return true;
     else return false;
 }
 
 void ArrayList::clear()
 {
     delete[] list;
-    cursor = 0;
+    totalItems = 0;
 }
 
-void ArrayList::add(int location, int item)
+void ArrayList::insert(int64_t location, int item)
+{
+}
+
+void ArrayList::add(ArrayList& obj)
 {
 }
 
@@ -33,27 +58,31 @@ void ArrayList::add(int item)
 {
     if(!isFull())
     {
-        list[cursor] = item;
-        cursor++;
+        list[totalItems] = item;
+        //if(totalItems ==)
+        totalItems++;
+        //Add item 
+        
+            
     }
 }
 
-void ArrayList::remove(int location)
+void ArrayList::remove(int64_t location)
 {
 
 } 
 
-int ArrayList::indexOf(int item)
+int64_t ArrayList::indexOf(int item)
 {
     return 0;
 } 
 
-int ArrayList::get(int location)
+int ArrayList::get(int64_t location)
 {
-    return list[location-1];
+    return list[localtion];
 } 
 
-int ArrayList::size()
+int64_t ArrayList::size()
 {
-    return cursor;
+    return totalItems;
 }
