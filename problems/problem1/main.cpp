@@ -18,5 +18,12 @@ int main()
     ListUtil::printList(&a);
     cout << "Size of list: " << a.size() << endl;
 
+    cout << "\n";  
+
+    a.remove(a.indexOf(12));
+    ListUtil::printList(&a);
+    cout << "Size of list: " << a.size() << endl;
+
+
     return 0;
 }
