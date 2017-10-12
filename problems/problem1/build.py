@@ -1,3 +1,3 @@
 from subprocess import call
 
-call(["g++", "--std=c++11", "main.cpp", "../../lib/ArrayList.cpp", "../../lib/util/ListUtil.cpp"])
+call(["g++", "main.cpp", "../../lib/ArrayList.cpp", "../../lib/util/ListUtil.cpp", "-omain", "--std=c++11"])

@@ -20,12 +20,12 @@ ArrayList* ListUtil::readListWithIncrease(ArrayList* list)
 
 void ListUtil::printList (ArrayList* list)
 {
-    cout<<"List---"<<endl;
+    cout<< "List---" << endl;
 
     for(int index = 0; index < list->size(); ++index)
     {
         cout<< list->get(index) << " ";
     }
 
-    cout << endl;
+    cout<< endl;
 }
