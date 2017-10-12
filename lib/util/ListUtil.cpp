@@ -6,22 +6,26 @@ using namespace std;
 
 ArrayList* ListUtil::readList(ArrayList* list)
 {
-	list->add(3);
-	list->add(5);
-	list->add(15);
-	list->add(7);
-	list->add(73);
-	return list;
+    for(int index = 0; index < 4; ++index)
+        list->add(index);
+    return list;
+}
+
+ArrayList* ListUtil::readListWithIncrease(ArrayList* list)
+{
+    for(int index = 0; index < 21; ++index)
+        list->add(index);
+    return list;
 }
 
 void ListUtil::printList (ArrayList* list)
 {
-	cout<<"List---"<<endl;
-	
-	for(int index = 0; index < list->size(); ++index)
-	{
-		cout<< list->get(index) << " ";
-	}
+    cout<<"List---"<<endl;
 
-        cout << endl;
+    for(int index = 0; index < list->size(); ++index)
+    {
+        cout<< list->get(index) << " ";
+    }
+
+    cout << endl;
 }

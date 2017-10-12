@@ -8,12 +8,15 @@ int main()
 {
     ArrayList a;
     ListUtil::readList(&a);
-
-    a.add(562);
-    a.add(-2);
-
     ListUtil::printList(&a);
     cout << "Size of list: " << a.size() << endl;
-    //printf("hello\n");//<< "hello";       	
+    a.clear();
+
+    cout << "\n";
+
+    ListUtil::readListWithIncrease(&a);
+    ListUtil::printList(&a);
+    cout << "Size of list: " << a.size() << endl;
+
     return 0;
 }

@@ -2,6 +2,14 @@
 
 void ArrayList::increaseSpace(int space)
 {
+    int* tmp = new int[capacity + space];
+
+    for(int index = 0; index < totalItems; ++index)
+        tmp[index] = list[index];
+
+    delete[] list;
+    list = tmp;
+    capacity += space;
 }
 
 void ArrayList::decreaseSpace(int space) 
@@ -10,9 +18,9 @@ void ArrayList::decreaseSpace(int space)
 
 ArrayList::ArrayList() 
 {
-    capacity    = 20;
+    capacity    = 5;
     totalItems  = 0;
-    blockSize   = 124;
+    blockSize   = 3;
     list = new int[capacity];
 }
 
@@ -22,6 +30,7 @@ ArrayList::ArrayList(int64_t capacity)
     this->totalItems  = 0;
     this->blockSize   = 124;
     list = new int[this->capacity];
+    
 }
 
 ArrayList::ArrayList(ArrayList& obj) 
