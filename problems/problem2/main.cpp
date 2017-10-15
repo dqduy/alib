@@ -1,17 +1,33 @@
+/*
+ * Author: Duy Quoc
+ *
+ * Description: Parse characters from file with utf-8 encoding
+ *
+ * Detail: 
+ *      - English
+ *      - Vietnamese
+ *      - Chinese
+ */
+
 using namespace std;
 
 #include<iostream>
-#include "lib/ArrayList.cpp"
-#include "util/ListUtil.cpp"
 
+void readString()
+{
+}
+
+void parseString() 
+{
+}
+
+void printString()
+{
+}
 
 int main()
 {
-    ArrayList a(6);	
-    ListUtil::readList(&a);
-    ListUtil::printList(&a);
-	
-    //Test forr update program for Git over GL
-        	
+    
+    
     return 0;
 }
