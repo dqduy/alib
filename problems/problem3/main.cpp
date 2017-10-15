@@ -8,5 +8,6 @@ int main()
     tinyxml2::XMLDocument doc;
     doc.LoadFile("sample.html");
     doc.Print();
+
     return 0;
 }
