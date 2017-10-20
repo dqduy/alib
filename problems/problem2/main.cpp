@@ -13,8 +13,35 @@ using namespace std;
 
 #include<iostream>
 #include<cstdint>
+#include<vector>
 
-unsigned char* text = new unsigned char[7];
+struct CodePoint {
+    vector<uint8_t> codeUnits;
+    void addCodeUnit(uint8_t unit){
+        codeUnits.push_back(unit);
+    }
+
+    int getCodePoint() {
+
+    }
+};
+
+vector<CodePoint*> str;
+
+uint8_t* text = new uint8_t[7];
+int32_t cp[4];
+
+uint8_t maskClass1e = 0x00;     //1000 0000
+uint8_t maskClass2e = 0xE0;     //1110 0000
+uint8_t maskClass3e = 0xF0;     //1111 0000
+uint8_t maskClass4e = 0xF8;     //1111 1000
+uint8_t maskClassee = 0xC0;     //1100 0000
+
+uint8_t maskClass1d = 0x7F;     //0111 1111
+uint8_t maskClass2d = 0x1F;     //0001 1111
+uint8_t maskClass3d = 0x0F;     //0000 1111
+uint8_t maskClass4d = 0x07;     //0000 0111
+uint8_t maskClassed = 0x3F;     //0011 1111
 
 void readString()
 {
@@ -33,7 +60,7 @@ void readString()
     //
     //code point: g     U+0067  - 103
     //  code unit       0x67    - 103   - 0110 0111
-
+    //
     text[0] = 0xC4;
     text[1] = 0x91;
     text[2] = 0xE1;
@@ -46,6 +73,32 @@ void readString()
 
 void parseString() 
 {
+    uint32_t tmp = text[2] & maskClass3d;
+    uint32_t tmq = text[3] & maskClassed;
+    uint32_t tmr = text[4] & maskClassed;
+
+    //cout<< ((((tmp << 6) | tmq) << 6) | tmr) << " ========" <<endl;
+
+    CodePoint* cp = new CodePoint();
+
+    for(int index = 0; index < 7; ++index) 
+    {
+        if((text[index] & maskClass1e) == 0x0) {
+            cp->addCodeUnit(text[index]);
+//            str.push_back(cp);
+        } else if(((text[index] & maskClass2e) == 0xC0) || 
+                  ((text[index] & maskClass3e) == 0xE0) ||
+                  ((text[index] & maskClass4e) == 0xF0)) {
+            //str.push_back(cp);
+            cp = new CodePoint();
+            cp->addCodeUnit(text[index]);
+        } else if(((text[index] & maskClassee) == 0x80)) {
+            cp->addCodeUnit(text[index]);
+        }
+        
+    }
+
+    cout<< str.size();
 }
 
 void printString()
@@ -73,10 +126,11 @@ int main()
 
     uint32_t p = pattern1 & mask1; 
 
-    cout<< (p << 1) << "" << (pattern1 & mask2) << endl;
+    //cout<< (p << 1) << "" << (pattern1 & mask2) << endl;
 
     readString();
-    printString();
+    parseString();
+    //printString();
 
     return 0;
 }
