@@ -14,24 +14,13 @@ using namespace std;
 #include<iostream>
 #include<cstdint>
 #include<vector>
+#include<bitset>
 
-struct CodePoint {
-    vector<uint8_t> codeUnits;
-    void addCodeUnit(uint8_t unit){
-        codeUnits.push_back(unit);
-    }
-
-    int getCodePoint() {
-
-    }
-};
-
-vector<CodePoint*> str;
-
-uint8_t* text = new uint8_t[7];
+int len = 11;
+uint8_t* text = new uint8_t[len];
 int32_t cp[4];
 
-uint8_t maskClass1e = 0x00;     //1000 0000
+uint8_t maskClass1e = 0x80;     //1000 0000
 uint8_t maskClass2e = 0xE0;     //1110 0000
 uint8_t maskClass3e = 0xF0;     //1111 0000
 uint8_t maskClass4e = 0xF8;     //1111 1000
@@ -42,6 +31,60 @@ uint8_t maskClass2d = 0x1F;     //0001 1111
 uint8_t maskClass3d = 0x0F;     //0000 1111
 uint8_t maskClass4d = 0x07;     //0000 0111
 uint8_t maskClassed = 0x3F;     //0011 1111
+
+struct CodePoint {
+    vector<uint8_t> codeUnits;
+    void addCodeUnit(uint8_t unit)
+    {
+        codeUnits.push_back(unit);
+    }
+
+    uint32_t getCodePoint() 
+    {
+        uint32_t cp = 0x0;
+        switch(size()) {
+            case 1:
+                cp = codeUnits[0] & maskClass1d;
+                break;
+            case 2:
+                cp = codeUnits[0] & maskClass2d;
+                cp = (cp << 6) | (codeUnits[1] & maskClassed);
+                break;
+            case 3:
+                cp = codeUnits[0] & maskClass3d;
+                cp = (cp << 6) | (codeUnits[1] & maskClassed);
+                cp = (cp << 6) | (codeUnits[2] & maskClassed);
+                break;
+            case 4:
+                cp = codeUnits[0] & maskClass4d;
+                cp = (cp << 6) | (codeUnits[1] & maskClassed);
+                cp = (cp << 6) | (codeUnits[2] & maskClassed);
+                cp = (cp << 6) | (codeUnits[3] & maskClassed);
+                break;
+        }
+        return cp;
+    }
+
+    int size() 
+    {
+        return codeUnits.size();
+    }
+
+    void print() 
+    {
+        cout<< "This code point: " << getCodePoint() <<endl;
+        cout<< "Code units: " << size() <<endl;
+        for(int index = 0; index < size(); ++index) {
+            cout<< "Unit " << index << ": "
+                << bitset<8>(codeUnits[index]) << "\t"
+                << (int)codeUnits[index] << "\n";
+            //cout<< std::hex << codeUnits[index] << "\n";
+        }
+        cout<<endl;    
+    }
+};
+
+vector<CodePoint*> str;
 
 void readString()
 {
@@ -61,6 +104,7 @@ void readString()
     //code point: g     U+0067  - 103
     //  code unit       0x67    - 103   - 0110 0111
     //
+    //67872𐤠
     text[0] = 0xC4;
     text[1] = 0x91;
     text[2] = 0xE1;
@@ -68,69 +112,60 @@ void readString()
     text[4] = 0xB7;
     text[5] = 0x6E;
     text[6] = 0x67;
-
+    text[7] = 0xF0;
+    text[8] = 0x90;
+    text[9] = 0xA4;
+    text[10] = 0xA0;
 }
 
 void parseString() 
-{
-    uint32_t tmp = text[2] & maskClass3d;
-    uint32_t tmq = text[3] & maskClassed;
-    uint32_t tmr = text[4] & maskClassed;
+{   
+    CodePoint* cp = nullptr;//new CodePoint();
 
-    //cout<< ((((tmp << 6) | tmq) << 6) | tmr) << " ========" <<endl;
-
-    CodePoint* cp = new CodePoint();
-
-    for(int index = 0; index < 7; ++index) 
+    for(int index = 0; index < len; ++index) 
     {
         if((text[index] & maskClass1e) == 0x0) {
+            if(cp != nullptr && cp->size() > 0)
+                str.push_back(cp);
+            cp = new CodePoint();
             cp->addCodeUnit(text[index]);
-//            str.push_back(cp);
+
+            if(index >= len - 1)
+                str.push_back(cp);
+            //cout<< "case 1 - " << (int) text[index] << " - " << (text[0] & maskClass1e) <<endl;
         } else if(((text[index] & maskClass2e) == 0xC0) || 
-                  ((text[index] & maskClass3e) == 0xE0) ||
-                  ((text[index] & maskClass4e) == 0xF0)) {
-            //str.push_back(cp);
+                ((text[index] & maskClass3e) == 0xE0) ||
+                ((text[index] & maskClass4e) == 0xF0)) {
+            //cout<< "case 2 - " << (int) text[index] <<endl;
+            if(cp != nullptr && cp->size() > 0)
+                str.push_back(cp);
             cp = new CodePoint();
             cp->addCodeUnit(text[index]);
         } else if(((text[index] & maskClassee) == 0x80)) {
             cp->addCodeUnit(text[index]);
+            //cout<< "case 3 - " << (int) text[index] <<endl;
+            if(index >= len - 1)
+                str.push_back(cp);
         }
-        
-    }
 
-    cout<< str.size();
+    }
+    //cout<< text <<endl;
+
 }
 
 void printString()
 {
-    cout<< "This string is:" << endl;
-    for(int index = 0; index < 7; ++index)
-    {
-        cout<< (int)text[index] << ", ";
-    }
-
-    cout<< endl;
-
-    cout<< 0x0111 << " - " << 0x1EB7 << "- " << 0x006E << " - " << 0x0067 << endl;
+    cout<< "Total cp: " << str.size() <<endl;
+    for(int index = 0; index < str.size(); ++index)
+        str[index]->print();
 }
 
 
 int main()
-{
-
-    unsigned char mask1 = 224;          //1110 0000
-    unsigned char mask2 = 31;           //0001 1111
-
-    unsigned char pattern1 = 223;       //1101 1111      
-    unsigned char pattern2 = 143;       //1000 1111
-
-    uint32_t p = pattern1 & mask1; 
-
-    //cout<< (p << 1) << "" << (pattern1 & mask2) << endl;
-
+{   
     readString();
     parseString();
-    //printString();
-
+    printString();
+    //cout<< sizeof(int);
     return 0;
 }
