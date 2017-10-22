@@ -15,6 +15,7 @@ using namespace std;
 #include<cstdint>
 #include<vector>
 #include<bitset>
+#include<fstream>
 
 int len = 11;
 uint8_t* text = new uint8_t[len];
@@ -160,6 +161,7 @@ void printString()
         str[index]->print();
 }
 
+#include<sys/stat.h>
 
 int main()
 {   
@@ -167,5 +169,24 @@ int main()
     parseString();
     printString();
     //cout<< sizeof(int);
+    //
+    
+    ifstream ip("sample_zh.txt");
+    
+    int i = 0;
+    char c;
+    while(ip.get(c)) {
+        //ip >> c;
+        //ip.get(c);
+        i++;
+    }
+
+    struct stat r;
+    if(stat("sample_vi.txt", &r) == 0) {
+        cout<< r.st_size <<endl; 
+    }
+
+    cout << "bytes: " << i <<endl;
+
     return 0;
 }
