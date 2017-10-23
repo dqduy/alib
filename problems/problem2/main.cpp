@@ -105,7 +105,8 @@ void readString()
     //code point: g     U+0067  - 103
     //  code unit       0x67    - 103   - 0110 0111
     //
-    //67872𐤠
+    //67872
+    //
     text[0] = 0xC4;
     text[1] = 0x91;
     text[2] = 0xE1;
@@ -156,37 +157,103 @@ void parseString()
 
 void printString()
 {
-    cout<< "Total cp: " << str.size() <<endl;
     for(int index = 0; index < str.size(); ++index)
         str[index]->print();
+    cout<< "Total cp: " << str.size() <<endl;
 }
 
 #include<sys/stat.h>
+#include<stdio.h>
+
+vector<CodePoint*>      source;         //Extract and format code point (utf8 encoding) from file
+
+vector<CodePoint*>      charList;       //List of code point after analyze from source string
+vector<int>             charListCount;  //Amount of each code point in charList
+char                   sourceName[26] = "sample_vi.txt";
+
+
+void loadString() 
+{
+    bool isEndFile = false;
+    char c;
+    int count = 0;
+    CodePoint* cp = nullptr;
+    ifstream inputSource(sourceName);
+
+    while(true) 
+    {
+        if(inputSource.get(c))
+        {
+            ++count;
+            printf("%d ", (unsigned char)c);
+            if((c & maskClass1e) == 0x0) {
+                if(cp != nullptr && cp->size() > 0)
+                    source.push_back(cp);
+                cp = new CodePoint();
+                cp->addCodeUnit(c);
+
+//                if(index >= len - 1)
+//                    str.push_back(cp);
+                //cout<< "case 1 - " << (int) text[index] << " - " << (text[0] & maskClass1e) <<endl;
+            } else if(((c & maskClass2e) == 0xC0) || 
+                      ((c & maskClass3e) == 0xE0) ||
+                      ((c & maskClass4e) == 0xF0)) {
+                //cout<< "case 2 - " << (int) text[index] <<endl;
+                if(cp != nullptr && cp->size() > 0)
+                    source.push_back(cp);
+                cp = new CodePoint();
+                cp->addCodeUnit(c);
+            } else if(((c & maskClassee) == 0x80)) {
+                cp->addCodeUnit(c);
+                //cout<< "case 3 - " << (int) text[index] <<endl;
+//                if(index >= len - 1)
+//                    str.push_back(cp);
+            }
+
+        }
+        else 
+        {
+            source.push_back(cp);
+            cout<< "End of file" <<endl;
+            break;
+        } 
+
+    }
+
+    cout<< "Total bytes: " << count <<endl;
+}
+
+void extractString() 
+{
+}
+
+void analyzeString() 
+{
+}
+
+void displayString()
+{
+    for(int index = 0; index < source.size(); ++index)
+        source[index]->print();
+    cout<< "Total cp: " << source.size() <<endl;
+}
 
 int main()
 {   
-    readString();
-    parseString();
-    printString();
+    //readString();
+    //parseString();
+    //printString();
     //cout<< sizeof(int);
     //
-    
-    ifstream ip("sample_zh.txt");
-    
-    int i = 0;
-    char c;
-    while(ip.get(c)) {
-        //ip >> c;
-        //ip.get(c);
-        i++;
-    }
+    loadString();
+    displayString();
 
     struct stat r;
     if(stat("sample_vi.txt", &r) == 0) {
-        cout<< r.st_size <<endl; 
+        cout<< "Total size on disk: " << r.st_size <<endl; 
     }
 
-    cout << "bytes: " << i <<endl;
+    //    cout << "bytes: " << i <<endl;
 
     return 0;
 }
