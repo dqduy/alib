@@ -73,15 +73,25 @@ struct CodePoint {
 
     void print() 
     {
-        cout<< "This code point: " << getCodePoint() <<endl;
+        cout<< "This code point: 0x" << std::hex << getCodePoint() 
+            << " - " << std::dec << getCodePoint() <<endl;
         cout<< "Code units: " << size() <<endl;
         for(int index = 0; index < size(); ++index) {
             cout<< "Unit " << index << ": "
                 << bitset<8>(codeUnits[index]) << "\t"
-                << (int)codeUnits[index] << "\n";
-            //cout<< std::hex << codeUnits[index] << "\n";
+                << "0x" << std::hex << (int)codeUnits[index]
+                << "  " << std::dec << (int)codeUnits[index]
+                << "\n";
         }
         cout<<endl;    
+    }
+
+    string getHex() {
+        string s = "";
+        for(int index = 0; index < size(); ++index) {
+            s += "\\x" + to_string(codeUnits[index]);
+        }
+        return s;
     }
 };
 
@@ -165,7 +175,7 @@ void printString()
 #include<sys/stat.h>
 #include<stdio.h>
 
-vector<CodePoint*>      source;         //Extract and format code point (utf8 encoding) from file
+vector<CodePoint*>      source;         //Extract code points (utf8 encoding) from file
 
 vector<CodePoint*>      charList;       //List of code point after analyze from source string
 vector<int>             charListCount;  //Amount of each code point in charList
@@ -185,15 +195,12 @@ void loadString()
         if(inputSource.get(c))
         {
             ++count;
-            printf("%d ", (unsigned char)c);
+            //printf("%d ", (unsigned char)c);
             if((c & maskClass1e) == 0x0) {
                 if(cp != nullptr && cp->size() > 0)
                     source.push_back(cp);
                 cp = new CodePoint();
                 cp->addCodeUnit(c);
-
-//                if(index >= len - 1)
-//                    str.push_back(cp);
                 //cout<< "case 1 - " << (int) text[index] << " - " << (text[0] & maskClass1e) <<endl;
             } else if(((c & maskClass2e) == 0xC0) || 
                       ((c & maskClass3e) == 0xE0) ||
@@ -206,15 +213,13 @@ void loadString()
             } else if(((c & maskClassee) == 0x80)) {
                 cp->addCodeUnit(c);
                 //cout<< "case 3 - " << (int) text[index] <<endl;
-//                if(index >= len - 1)
-//                    str.push_back(cp);
             }
 
         }
         else 
         {
             source.push_back(cp);
-            cout<< "End of file" <<endl;
+            //cout<< "End of file" <<endl;
             break;
         } 
 
@@ -223,21 +228,66 @@ void loadString()
     cout<< "Total bytes: " << count <<endl;
 }
 
-void extractString() 
+void sortString() 
 {
+    for(int out = 0; out < charList.size() - 1; ++out) {
+        for(int in = out + 1; in < charList.size(); ++in) {
+            if(charList[out]->getCodePoint() > charList[in]->getCodePoint()) {
+                CodePoint* tmp = charList[out];
+                charList[out] = charList[in];
+                charList[in] = tmp;
+
+                int tmp1 = charListCount[out];
+                charListCount[out] = charListCount[in];
+                charListCount[in] = tmp1;
+            }
+        }
+    }
+}
+
+int hasCodePoint(int cp) 
+{
+    for(int index = 0; index < charList.size(); ++index) {
+        if(cp == charList[index]->getCodePoint())
+            return index;
+    }
+    return -1;
 }
 
 void analyzeString() 
 {
+    int contain = -1;
+    for(int out = 0; out < source.size(); ++out) {
+        contain = hasCodePoint(source[out]->getCodePoint());
+        if(contain != -1)
+            charListCount[contain]++;
+        else {
+            charList.push_back(source[out]);
+            charListCount.push_back(1);
+        }
+    }
+
+    sortString();
 }
 
 void displayString()
 {
-    for(int index = 0; index < source.size(); ++index)
-        source[index]->print();
-    cout<< "Total cp: " << source.size() <<endl;
+    //for(int index = 0; index < source.size(); ++index)
+        //source[index]->print();
+    cout<< "Total cp from file : " << source.size() << "\n\n";
+    cout<< "Total cp after sort: " << charList.size() << "\n\n";
+
+    for(int index = 0; index < charListCount.size(); ++index) {
+        cout<< "Code point: U+" << std::hex << charList[index]->getCodePoint()
+            << "\t" << std::dec << charList[index]->getCodePoint() 
+            << "\t\tappear\t " << std::dec << charListCount[index] <<endl;
+        if(charList[index]->getCodePoint() > 50)
+            cout<< charList[index]->getHex() <<endl;
+    }
 }
 
+#include<iomanip>
+#include<sstream>
 int main()
 {   
     //readString();
@@ -246,14 +296,18 @@ int main()
     //cout<< sizeof(int);
     //
     loadString();
+    analyzeString();
     displayString();
 
     struct stat r;
-    if(stat("sample_vi.txt", &r) == 0) {
+    if(stat(sourceName, &r) == 0) {
         cout<< "Total size on disk: " << r.st_size <<endl; 
     }
 
-    //    cout << "bytes: " << i <<endl;
+    uint8_t a = 196, b = 145;
+
+    //cout<< "\x" << std::to_string((int)a);
+    cout << "\xC4\x91\xE1\xBA\xB7" <<endl;
 
     return 0;
 }
