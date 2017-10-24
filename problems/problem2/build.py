@@ -1,3 +1,3 @@
 from subprocess import call
 
-call(["g++", "main.cpp", "-omain", "--std=c++11"])
+call(["g++", "CodePoint.cpp", "main.cpp", "-omain", "--std=c++11"])
