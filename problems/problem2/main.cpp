@@ -24,7 +24,6 @@
 using namespace std;
 
 vector<CodePoint*>      source;         //Extract code points (utf8 encoding) from file
-
 vector<CodePoint*>      charList;       //List of code point after analyze from source string
 vector<int>             charListCount;  //Amount of each code point in charList
 char                    sourceName[128];
@@ -36,10 +35,8 @@ void loadString()
     CodePoint* cp = nullptr;
     ifstream inputSource(sourceName, ios::binary);
 
-    while(true) 
-    {
-        if(inputSource.get(c))
-        {
+    while(true) {
+        if(inputSource.get(c)) {
             ++bytes;
             if((c & U8Mask::maskClass1e) == 0x0) {
                 if(cp != nullptr && cp->size() > 0)
@@ -60,8 +57,7 @@ void loadString()
                 //cout<< "case 3 - " << (int) text[index] <<endl;
             }
         }
-        else 
-        {
+        else {
             source.push_back(cp);
             break;
         } 
@@ -119,7 +115,7 @@ void displayString()
             << "\t\tappear\t " << std::dec << charListCount[index] <<endl;
     }
     
-    cout<< "Total bytes in file: " << bytes << "\n";
+    cout<< "Total read bytes in file: " << bytes << "\n";
     cout<< "Total cp from file : " << source.size() << "\n";
     cout<< "Total cp after sort: " << charList.size() << "\n";
 }
@@ -136,4 +132,3 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
