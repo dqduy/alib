@@ -18,6 +18,7 @@
 #include<cstdint>
 #include<vector>
 #include<fstream>
+#include<cstring>
 #include "CodePoint.h"
 
 using namespace std;
@@ -123,13 +124,13 @@ void displayString()
     cout<< "Total cp after sort: " << charList.size() << "\n";
 }
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
 #if defined(WINDOWS)
     SetConsoleOutputCP(65001);
 #endif    
-    strcpy(sourceName, argv[1]);
-    loadString();
+    std::strcpy(sourceName, argv[1]);
+	loadString();
     analyzeString();
     displayString();
 
