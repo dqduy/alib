@@ -51,8 +51,8 @@ uint8_t* CodePoint::getString() {
     uint8_t* s = new uint8_t[size() + 1];
     for(int index = 0; index < size(); ++index)
         s[index] = codeUnits[index];
-    s[size()] = 0;
-
+    s[size()] = '\0';
+    //std::cout<< " ================" << size();
     return s;
 }
 

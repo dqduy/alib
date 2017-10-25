@@ -8,7 +8,12 @@
  *      - Vietnamese
  *      - Chinese
  */
+ 
+//#define WINDOWS -1
 
+#if defined(WINDOWS)
+#include<windows.h>
+#endif
 #include<iostream>
 #include<cstdint>
 #include<vector>
@@ -21,14 +26,14 @@ vector<CodePoint*>      source;         //Extract code points (utf8 encoding) fr
 
 vector<CodePoint*>      charList;       //List of code point after analyze from source string
 vector<int>             charListCount;  //Amount of each code point in charList
-char                    sourceName[26] = "sample_vi.txt";
+char                    sourceName[128];
 int                     bytes = 0;
 
 void loadString() 
 {
     char c;
     CodePoint* cp = nullptr;
-    ifstream inputSource(sourceName);
+    ifstream inputSource(sourceName, ios::binary);
 
     while(true) 
     {
@@ -106,9 +111,6 @@ void analyzeString()
 
 void displayString()
 {
-    //for(int index = 0; index < source.size(); ++index)
-        //source[index]->print();
-
     for(int index = 0; index < charListCount.size(); ++index) {
         cout<< "Code point: U+" << std::hex << charList[index]->getCodePoint()
             << "\t" << std::dec << charList[index]->getCodePoint() 
@@ -122,10 +124,15 @@ void displayString()
 }
 
 int main(int argc, char** argv)
-{         
+{
+#if defined(WINDOWS)
+    SetConsoleOutputCP(65001);
+#endif    
+    strcpy(sourceName, argv[1]);
     loadString();
     analyzeString();
     displayString();
 
     return 0;
 }
+
