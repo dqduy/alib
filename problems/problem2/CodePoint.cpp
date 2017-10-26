@@ -27,8 +27,8 @@ uint32_t CodePoint::getCodePoint() {
             break;
         case 4:
             cp = codeUnits[0] & U8Mask::maskClass4d;
-			cp = (cp << 6) | (codeUnits[1] & U8Mask::maskClassed);
-			cp = (cp << 6) | (codeUnits[2] & U8Mask::maskClassed);
+            cp = (cp << 6) | (codeUnits[1] & U8Mask::maskClassed);
+            cp = (cp << 6) | (codeUnits[2] & U8Mask::maskClassed);
             cp = (cp << 6) | (codeUnits[3] & U8Mask::maskClassed);
             break;
     }
