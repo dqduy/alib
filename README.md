@@ -1,2 +1,1 @@
-# datastructures
-Learn many data structures in the world
+﻿# Discover Computer SystemLearn and apply new lessons in the world to my life## List of problems1. (Completed) Implement ArrayList2. (Completed) Extract code point (utf-8) from file3. (Progress) Bookmark manager in console4. (Completed) Introduction SDL 2
