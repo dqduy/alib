@@ -4,6 +4,15 @@ main
 *.class
 
 #################
+## problem 8
+#################
+libs/
+generated/
+obj/
+.gradle/
+.idea/
+
+#################
 ## Eclipse
 #################
 
