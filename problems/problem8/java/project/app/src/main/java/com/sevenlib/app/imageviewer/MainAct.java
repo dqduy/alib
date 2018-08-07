@@ -16,7 +16,7 @@ public class MainAct extends Activity {
     private native String getMessage();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         android.util.Log.i("duy", "Begin app");
         setContentView(R.layout.list);

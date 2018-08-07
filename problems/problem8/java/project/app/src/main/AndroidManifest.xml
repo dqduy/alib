@@ -8,9 +8,10 @@
         android:supportsRtl="true"
     >
         <activity android:name=".MainAct">
-            
         </activity>
         <activity android:name=".ListAct">
+        </activity>
+        <activity android:name=".GeneralAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

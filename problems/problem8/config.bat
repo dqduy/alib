@@ -8,7 +8,7 @@ set JAVA_DIR=%ROOT_DIR%java
 set SCRIPT_DIR=%ROOT_DIR%scripts
 set GEN_DIR=%ROOT_DIR%generated
 
-set NDK_PATH=F:\DevTools\android-ndk-r13b
+set NDK_PATH=F:\DevTools\android-ndk-r15c
 set SDK_PATH=F:\DevTools\sdk
 
 rem Application settings
