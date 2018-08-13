@@ -11,6 +11,13 @@ import android.util.Log;
 import android.view.Window;  
 import java.io.File;
 import android.os.Environment;
+import android.content.Intent;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import android.net.Uri;
+import android.support.v4.provider.DocumentFile;
 
 public class GeneralAct extends Activity {
     private final String TAG_NAME = "duy";
@@ -22,7 +29,81 @@ public class GeneralAct extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
+        Intent sender = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        startActivityForResult(sender, 25);
         getPathFromDevice();
+
+        File file = new File("/storage/external_SD","lg.txt");
+        StringBuilder text = new StringBuilder();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+        
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
+
+            //PLog.WriteLog(PLog.MAIN_TAG, text.toString());
+        }
+        catch (Exception e) {
+            //You'll need to add proper error handling here
+        }
+
+        {
+            File out = new File("/storage/external_SD","lg1.txt");
+            
+            String data = "result removable";
+            try {
+                FileOutputStream outStream = new FileOutputStream(out);
+                outStream.write(data.getBytes());
+                outStream.close();
+            }
+            catch (Exception e) {
+                PLog.WriteLog(PLog.MAIN_TAG, "Fail to write to removable storage");
+            } 
+            finally {
+                
+            }
+        }
+
+        {
+            File out = new File("/storage/emulated/0","lg1.txt");
+            
+            String data = "result external";
+            try {
+                FileOutputStream outStream = new FileOutputStream(out);
+                outStream.write(data.getBytes());
+                outStream.close();
+            }
+            catch (Exception e) {
+                PLog.WriteLog(PLog.MAIN_TAG, "Fail to write to external storage");
+            } 
+            finally {
+                
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 25 && resultCode == RESULT_OK) {
+            //getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            Uri treeUri = data.getData();
+            PLog.WriteLog(PLog.MAIN_TAG, "Uri: " + treeUri.toString());    
+            PLog.WriteLog(PLog.MAIN_TAG, "Uri - getPath(): " + treeUri.getPath());
+            DocumentFile docRoot = DocumentFile.fromTreeUri(this, treeUri);
+            PLog.WriteLog(PLog.MAIN_TAG, "Found item: " + docRoot.getName() + " - " + docRoot.getType());
+            for(DocumentFile file: docRoot.listFiles()) {
+                if(file.isFile())
+                    PLog.WriteLog(PLog.MAIN_TAG, "Found item: file" + file.getName() + " - " + file.getType());
+                else
+                    PLog.WriteLog(PLog.MAIN_TAG, "Found item: dir " + file.getName() + " - " + file.getType());
+            }
+
+        } 
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void getPathFromDevice() {
