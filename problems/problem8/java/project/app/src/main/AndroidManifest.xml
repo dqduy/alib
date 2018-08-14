@@ -13,6 +13,8 @@
         <activity android:name=".ListAct">
         </activity>
         <activity android:name=".GeneralAct">
+        </activity>
+        <activity android:name=".MenuAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
