@@ -26,7 +26,7 @@ echo ===========================================================
 echo                    MAKE NATIVE
 echo ===========================================================
 
-call %SCRIPT_DIR%\make_native.bat %P_ARCH% %BUILD_TYPE%
+rem call %SCRIPT_DIR%\make_native.bat %P_ARCH% %BUILD_TYPE%
 
 call %SCRIPT_DIR%\postProcessing.bat
 
