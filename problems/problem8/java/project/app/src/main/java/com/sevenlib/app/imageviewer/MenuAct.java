@@ -1,25 +1,27 @@
-<<<<<<< HEAD
 /*
     Author: Duy Quoc
     Title: Introduction Android life cycle
 */
 
-=======
->>>>>>> 1a2623ba1a0a2575a1a9fb484594cf40bd1182a6
 package com.sevenlib.app.imageviewer;
 
 import android.os.Bundle;
 import android.app.Activity;
-<<<<<<< HEAD
-import android.content.SharedPreferences;
 import android.widget.TextView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.view.GravityCompat;
+import android.support.design.widget.NavigationView;
+import android.support.v7.app.ActionBarDrawerToggle;
 
 public class MenuAct extends AppCompatActivity {
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle t;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,9 +30,28 @@ public class MenuAct extends AppCompatActivity {
 
         Toolbar bar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(bar);
-        //getSupportActionBar().setDisplayShowHomeEnabled(true);
-        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
-        bar.setNavigationIcon(R.drawable.horizontal_lines_32);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.horizontal_lines_24);
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        NavigationView nav = (NavigationView) findViewById(R.id.nav_view);
+        nav.setNavigationItemSelectedListener(
+            new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    // set item as selected to persist highlight
+                    menuItem.setChecked(true);
+                    // close drawer when item is tapped
+                    drawer.closeDrawers();
+
+                    // Add code here to update the UI based on the item selected
+                    // For example, swap UI fragments here
+
+                    return true;
+                }
+            });
     }
 
     @Override
@@ -47,7 +68,8 @@ public class MenuAct extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        PLog.WriteLog(PLog.MAIN_TAG, "item: " + id);
+    
         if (id == R.id.search) {
             Toast.makeText(MenuAct.this, "Search clicked", Toast.LENGTH_LONG).show();
             return true;
@@ -56,26 +78,12 @@ public class MenuAct extends AppCompatActivity {
             Toast.makeText(MenuAct.this, "Settings clicked", Toast.LENGTH_LONG).show();
             return true;
         }
+        else if (id == android.R.id.home) {
+            drawer.openDrawer(GravityCompat.START);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
-=======
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.widget.TextView;
 
-import java.util.ArrayList;
-
-public class MenuAct extends Activity {
-    static {
-        System.loadLibrary("hello");
-    }
-
-    private native String getMessage();
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
->>>>>>> 1a2623ba1a0a2575a1a9fb484594cf40bd1182a6
     }
 }
