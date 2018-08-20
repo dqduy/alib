@@ -1,6 +1,6 @@
 /*
     Author: Duy Quoc
-    Title: Introduction Android life cycle
+    Title: Introduction drawer layout
 */
 
 package com.sevenlib.app.imageviewer;
@@ -18,6 +18,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
+import java.util.ArrayList;
 
 public class MenuAct extends AppCompatActivity {
     private DrawerLayout drawer;
@@ -52,6 +55,12 @@ public class MenuAct extends AppCompatActivity {
                     return true;
                 }
             });
+
+        ArrayList<ImageItem> list = ImageItemCollection.createList();
+        RecyclerView listView = (RecyclerView) findViewById(R.id.my_list);
+        ImageItemsAdapter adapter = new ImageItemsAdapter(list);
+        listView.setLayoutManager(new LinearLayoutManager(this));
+        listView.setAdapter(adapter);
     }
 
     @Override

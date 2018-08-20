@@ -16,6 +16,8 @@
         <activity android:name=".GeneralAct">
         </activity>
         <activity android:name=".MenuAct">
+        </activity>
+        <activity android:name=".ImageDetail">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
