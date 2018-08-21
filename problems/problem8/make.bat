@@ -20,7 +20,7 @@ echo Generated directory:   %GEN_DIR%
 rem Processor Architecture, and build type
 set P_ARCH=%~1
 set BUILD_TYPE=%~2
-
+set INSTALL=%~3
 
 echo ===========================================================
 echo                    MAKE NATIVE
@@ -42,3 +42,14 @@ if "%~2"=="release" (
 ) else (
       xcopy /y %ROOT_DIR%generated\_asproject\app\build\outputs\apk\app-debug.apk %ROOT_DIR%\generated\apks\
 )  
+
+echo ===========================================================
+echo                    INSTALL APK
+echo ===========================================================
+
+if "%~2"=="release" (
+    adb install -r %ROOT_DIR%\generated\apks\app-release.apk
+) else (
+    adb install -r %ROOT_DIR%\generated\apks\app-debug.apk
+)
+ 
