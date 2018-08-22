@@ -2,7 +2,6 @@
 <resources xmlns:app="http://schemas.android.com/apk/res-auto">
     <style name="ImageDetailActionBar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:background">#7C4DFF</item>
-        <item name="android:actionButtonStyle">@style/myActionButtonStyle</item>
     </style>
     <style name="myActionButtonStyle" parent="Widget.AppCompat.ActionButton">
         <item name="android:layout_width">32px</item>

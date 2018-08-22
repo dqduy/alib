@@ -34,7 +34,7 @@ public class ImageDetailAct extends AppCompatActivity {
         setSupportActionBar(bar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.left_arrow_128);
+        actionbar.setHomeAsUpIndicator(R.drawable.left_arrow);
         actionbar.setTitle(title);
     }
 
