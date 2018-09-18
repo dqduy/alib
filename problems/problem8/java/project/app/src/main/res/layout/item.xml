@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="200px"
         android:layout_height="match_parent"
-        android:src="@drawable/flag" />
+        android:src="@drawable/share" />
 
     <TextView
         android:id="@+id/url"

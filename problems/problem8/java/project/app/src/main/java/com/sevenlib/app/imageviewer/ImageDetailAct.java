@@ -45,4 +45,33 @@ public class ImageDetailAct extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        PLog.WriteLog(PLog.MAIN_TAG, "item: " + id);
+    
+        switch(id) {
+            case android.R.id.home:
+                Toast.makeText(ImageDetailAct.this, "Home clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.share:
+                Toast.makeText(ImageDetailAct.this, "Share clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.delete:
+                Toast.makeText(ImageDetailAct.this, "Delete clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.settings:
+                //Toast.makeText(ImageDetailAct.this, "Settings clicked", Toast.LENGTH_SHORT).show();
+                break;                
+            default:
+                Toast.makeText(ImageDetailAct.this, "No one clicked", Toast.LENGTH_SHORT).show();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

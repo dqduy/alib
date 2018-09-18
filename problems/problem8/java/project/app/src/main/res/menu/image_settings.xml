@@ -14,5 +14,18 @@
         android:id="@+id/settings"
         android:title="Settings"
         android:icon="@drawable/settings"
-        app:showAsAction="ifRoom" /> 
+        app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/fnc_rename"
+                  android:title="Rename"/>
+            <item android:id="@+id/fnc_rename1"
+                  android:title="Copy To"/>
+            <item android:id="@+id/fnc_rename2"
+                  android:title="Move To"/>
+            <item android:id="@+id/fnc_rename3"
+                  android:title="Info"/>
+            <item android:id="@+id/fnc_rename4"
+                  android:title="Settings"/>      
+        </menu>    
+    </item> 
 </menu>

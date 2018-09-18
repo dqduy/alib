@@ -20,7 +20,10 @@
             app:contentInsetLeft="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp"
-            app:titleTextColor="@android:color/white">
+            app:titleTextColor="@android:color/white"
+            app:title="SimPic"
+            app:subtitle="12 folders"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
         </android.support.v7.widget.Toolbar>
         
     </LinearLayout>   

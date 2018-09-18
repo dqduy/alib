@@ -3,19 +3,19 @@
     <group android.checkableBehavior="single">
         <item 
             android:id="@+id/nav_aa" 
-            android:icon="@drawable/search_32" 
+            android:icon="@drawable/share" 
             android:title="Search" />
         <item 
             android:id="@+id/nav_bb" 
-            android:icon="@drawable/search_32" 
+            android:icon="@drawable/share" 
             android:title="Search" />
         <item 
             android:id="@+id/nav_cc" 
-            android:icon="@drawable/search_32" 
+            android:icon="@drawable/share" 
             android:title="Search" />
         <item 
             android:id="@+id/nav_dd" 
-            android:icon="@drawable/search_32" 
+            android:icon="@drawable/share" 
             android:title="Search" />
     </group>
 </menu>
