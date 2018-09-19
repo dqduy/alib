@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 func swap(a int, b int) (int, int) {
 	return b, a
@@ -65,30 +68,16 @@ func testPtr() {
 	//fmt.Println(&a)
 }
 
-type Team struct {
-	id       int
-	name     string
-	regional string
-}
+func testSort() {
+	points := []int{4, 6, 1}
+	sort.Ints(points)
+	fmt.Println(points)
 
-type PointDistribution struct {
-	placement int
-	point     int
-}
-
-type Match struct {
-	id        int
-	matchName string
-	mapName   string
-}
-
-type MatchDetails struct {
-	id     int
-	match  Match
-	team   Team
-	detail PointDistribution
+	for i, v := range points {
+		fmt.Println(i, " - ", v)
+	}
 }
 
 func main() {
-
+	testSort()
 }
