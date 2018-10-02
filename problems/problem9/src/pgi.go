@@ -455,8 +455,3 @@ func main() {
 	CalculatePGI()
 	DisplayAll()
 }
-
-func Calculate(x, y int) int {
-	return x + y
-
-}

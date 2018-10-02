@@ -6,7 +6,7 @@
 1. golang
 
 ## Content
-    
+    - Data was loaded from local
 
 ## Tech Stack
 
