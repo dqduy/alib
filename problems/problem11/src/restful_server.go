@@ -2,14 +2,12 @@ package main
 
 import (
 	"bufio"
-	"container/list"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -30,7 +28,7 @@ type Match struct {
 	Id                 int
 	MatchName          string
 	MapName            string
-	ListOfMatchDetails *list.List
+	ListOfMatchDetails []MatchDetails
 }
 
 /////////////////////////////////////////////////////////////
@@ -49,7 +47,7 @@ func (dt *MatchDetails) caculatePoint() {
 
 type ResultItem struct {
 	Team               Team
-	ListOfMatchDetails *list.List
+	ListOfMatchDetails []MatchDetails
 	TotalPoint         int
 }
 
@@ -70,12 +68,10 @@ func (this ByPoint) Swap(i, j int) {
 /////////////////////////////////////////////////////////////
 
 //Global data
-var listOfTeam *list.List = list.New()
-var listOfPointDistribution *list.List = list.New()
-var listOfMatchesTpp *list.List = list.New()
-var listOfMatchesFpp *list.List = list.New()
-var resultListTpp []ResultItem
-var resultListFpp []ResultItem
+var listOfTeam []Team = make([]Team, 0)
+var listOfPointDistribution []PointDistribution = make([]PointDistribution, 0)
+var listOfMatchesTpp []Match = make([]Match, 0)
+var listOfMatchesFpp []Match = make([]Match, 0)
 
 const dbName = "pgi.txt"
 
@@ -88,9 +84,9 @@ func MakePointDistribution(placement int, point int) PointDistribution {
 }
 
 func SearchTeam(id int) Team {
-	for index := listOfTeam.Front(); index != nil; index = index.Next() {
-		if id == index.Value.(Team).Id {
-			return index.Value.(Team)
+	for _, item := range listOfTeam {
+		if id == item.Id {
+			return item
 		}
 	}
 
@@ -98,9 +94,9 @@ func SearchTeam(id int) Team {
 }
 
 func SearchPointDistribution(placement int) PointDistribution {
-	for index := listOfPointDistribution.Front(); index != nil; index = index.Next() {
-		if placement == index.Value.(PointDistribution).Placement {
-			return index.Value.(PointDistribution)
+	for _, item := range listOfPointDistribution {
+		if placement == item.Placement {
+			return item
 		}
 	}
 
@@ -144,7 +140,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					listOfTeam.PushBack(MakeTeam(id,
+					listOfTeam = append(listOfTeam, MakeTeam(id,
 						strings.TrimSpace(tokens[1]),
 						strings.TrimSpace(tokens[2])))
 
@@ -157,7 +153,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					listOfPointDistribution.PushBack(MakePointDistribution(placement, point))
+					listOfPointDistribution = append(listOfPointDistribution, MakePointDistribution(placement, point))
 
 				case 3:
 					var tokens = strings.Split(str, ",")
@@ -169,7 +165,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					match := Match{id, tokens[1], tokens[2], list.New()}
+					match := Match{id, tokens[1], tokens[2], make([]MatchDetails, 0)}
 
 					for i := 0; i < (tokensLen-3)/3; i++ {
 						teamid, err := strconv.Atoi(strings.TrimSpace(tokens[3+(i*3)]))
@@ -181,10 +177,10 @@ func LoadData() {
 						matchdetail := MatchDetails{SearchTeam(teamid), SearchPointDistribution(placement), kill, 0}
 						matchdetail.caculatePoint()
 
-						match.ListOfMatchDetails.PushBack(matchdetail)
+						match.ListOfMatchDetails = append(match.ListOfMatchDetails, matchdetail)
 					}
 
-					listOfMatchesTpp.PushBack(match)
+					listOfMatchesTpp = append(listOfMatchesTpp, match)
 
 				case 4:
 					var tokens = strings.Split(str, ",")
@@ -196,7 +192,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					match := Match{id, tokens[1], tokens[2], list.New()}
+					match := Match{id, tokens[1], tokens[2], make([]MatchDetails, 0)}
 
 					for i := 0; i < (tokensLen-3)/3; i++ {
 						teamid, err := strconv.Atoi(strings.TrimSpace(tokens[3+(i*3)]))
@@ -208,10 +204,10 @@ func LoadData() {
 						matchdetail := MatchDetails{SearchTeam(teamid), SearchPointDistribution(placement), kill, 0}
 						matchdetail.caculatePoint()
 
-						match.ListOfMatchDetails.PushBack(matchdetail)
+						match.ListOfMatchDetails = append(match.ListOfMatchDetails, matchdetail)
 					}
 
-					listOfMatchesFpp.PushBack(match)
+					listOfMatchesFpp = append(listOfMatchesFpp, match)
 
 				default:
 					fmt.Printf("Unknown section")
@@ -223,186 +219,105 @@ func LoadData() {
 	}
 }
 
-//2. Calculate table
-func CalculatePGI() {
-	resultListTpp = make([]ResultItem, 0)
+func InitSettings() {
 
-	//Filter team result TPP
-	for item := listOfTeam.Front(); item != nil; item = item.Next() {
-		var data = item.Value.(Team)
-		resultItem := ResultItem{data, list.New(), 0}
-
-		//Each team we get all match details of each
-		for inner := listOfMatchesTpp.Front(); inner != nil; inner = inner.Next() {
-			var list = inner.Value.(Match).ListOfMatchDetails
-			//Add detail of specific match
-			for i := list.Front(); i != nil; i = i.Next() {
-				var detail = i.Value.(MatchDetails)
-				if detail.Team.Id == data.Id {
-					resultItem.ListOfMatchDetails.PushBack(detail)
-					resultItem.TotalPoint += detail.Detail.Point + detail.Kill*15
-				}
-			}
-		}
-		resultListTpp = append(resultListTpp, resultItem)
-	}
-
-	for item := listOfTeam.Front(); item != nil; item = item.Next() {
-		var data = item.Value.(Team)
-		resultItem := ResultItem{data, list.New(), 0}
-
-		//Each team we get all match details of each
-		for inner := listOfMatchesFpp.Front(); inner != nil; inner = inner.Next() {
-			var list = inner.Value.(Match).ListOfMatchDetails
-			//Add detail of specific match
-			for i := list.Front(); i != nil; i = i.Next() {
-				var detail = i.Value.(MatchDetails)
-				if detail.Team.Id == data.Id {
-					resultItem.ListOfMatchDetails.PushBack(detail)
-					resultItem.TotalPoint += detail.Detail.Point + detail.Kill*15
-				}
-			}
-		}
-		resultListFpp = append(resultListFpp, resultItem)
-	}
-
-	//Sort result list
-	//1. Point
-	//2. if two point's team is equal, we compare kill
-	sort.Sort(ByPoint(resultListTpp))
-	sort.Sort(ByPoint(resultListFpp))
-}
-
-//3. Display section
-func DisplayMatch(match Match) string {
-	var result = ""
-
-	result = "ID:         " + strconv.Itoa(match.Id) + "\n" +
-		"Match Name: " + match.MatchName + "\n" +
-		"Map:        " + match.MapName
-
-	result += "\n\tDetails: \n"
-
-	for inner := match.ListOfMatchDetails.Front(); inner != nil; inner = inner.Next() {
-		result += inner.Value.(MatchDetails).Team.Name + ", " +
-			inner.Value.(MatchDetails).Team.Regional + ", " +
-			strconv.Itoa(inner.Value.(MatchDetails).Kill) + ", " +
-			strconv.Itoa(inner.Value.(MatchDetails).TotalPoint) + "\n"
-	}
-
-	return result
-}
-
-func DisplayResultItems(list []ResultItem) string {
-	var result = ""
-	var start = 1
-	for _, item := range list {
-		result += strconv.Itoa(start) + ". " + item.Team.Name + "\t\t"
-		for inner := item.ListOfMatchDetails.Front(); inner != nil; inner = inner.Next() {
-			var data = inner.Value.(MatchDetails)
-			result += "[" + strconv.Itoa(data.Detail.Placement) + ", " + strconv.Itoa(data.Kill) + "]" + " - "
-
-		}
-		result += strconv.Itoa(item.TotalPoint) + "\n"
-
-		start++
-	}
-	return result
-}
-
-func DisplayAllTeams() {
-	if listOfTeam != nil {
-		fmt.Println("Total team: ", listOfTeam.Len())
-
-		for index := listOfTeam.Front(); index != nil; index = index.Next() {
-			fmt.Println(index.Value.(Team).Id, " - ", index.Value.(Team).Name, " - ", index.Value.(Team).Regional)
-		}
-
-		fmt.Print("\n")
-	}
-}
-
-func DisplayPointDistribution() {
-	if listOfPointDistribution != nil {
-		fmt.Println("Total point distribution: ", listOfPointDistribution.Len())
-
-		for index := listOfPointDistribution.Front(); index != nil; index = index.Next() {
-			fmt.Println(index.Value.(PointDistribution).Placement, " - ", index.Value.(PointDistribution).Point)
-		}
-		fmt.Print("\n")
-	}
-}
-
-func DisplayMatches() {
-	if listOfMatchesTpp != nil {
-		fmt.Println("Total matches: ", listOfMatchesTpp.Len())
-
-		for index := listOfMatchesTpp.Front(); index != nil; index = index.Next() {
-			fmt.Print(DisplayMatch(index.Value.(Match)))
-			fmt.Print("\n")
-		}
-	}
-}
-
-func DisplayAll() {
-	//1. Print teams
-	//DisplayAllTeams()
-
-	//2. Print point distributions
-	//DisplayPointDistribution()
-
-	//3. Print matches
-	//DisplayMatches()
-
-	//4. Print result items
-	fmt.Println("PUBG Global Invitational 2018")
-	fmt.Println("=============================\n")
-	fmt.Println("TPP:")
-	fmt.Println(DisplayResultItems(resultListTpp))
-	fmt.Println("FPP:")
-	fmt.Println(DisplayResultItems(resultListFpp))
 }
 
 func InitServer() {
 	InitSettings()
 	LoadData()
-	CalculatePGI()
-	DisplayAll()
 }
 
-func InitSettings() {
+///////////////////////////////////////////////////////////////////
+//List of API
+/*
+/teams				-> Get all teams in tournament
+/teams/{id}			-> Get a team in all team
+/points				-> Get all point distributions
+/points/{placement}	-> Get a point distribution
+/matches			-> Get all match with details
+/matches/{id}		-> Get a detail match
+*/
 
-}
-
+//1. Get all teams
 func GetTeams(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println("Request url: ", r.RequestURI)
 	json.NewEncoder(w).Encode(listOfTeam)
 }
 
+//2. Get a teams
 func GetTeam(w http.ResponseWriter, r *http.Request) {
-	// params := mux.Vars(r)
+	fmt.Println("Request url: ", r.RequestURI)
+	params := mux.Vars(r)
 
-	// for _, item := range listOfTeam {
-	// 	if strconv.Itoa(item.Id) == params["id"] {
-	// 		json.NewEncoder(w).Encode(item)
-	// 		return
-	// 	}
-	// }
-	// json.NewEncoder(w).Encode(Team{})
+	for _, item := range listOfTeam {
+		if strconv.Itoa(item.Id) == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(Team{})
 
+}
+
+//3. Get all point distributions
+func GetPoints(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Request url: ", r.RequestURI)
+	json.NewEncoder(w).Encode(listOfPointDistribution)
+}
+
+//4. Get a point distribution
+func GetPoint(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Request url: ", r.RequestURI)
+}
+
+//5. Get all matches
+func GetMatches(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Request url: ", r.RequestURI)
+	params := mux.Vars(r)
+
+	if params["type"] == "tpp" {
+		json.NewEncoder(w).Encode(listOfMatchesTpp)
+	} else if params["type"] == "fpp" {
+		json.NewEncoder(w).Encode(listOfMatchesFpp)
+	}
+
+}
+
+//6. Get a match
+func GetMatch(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Request url: ", r.RequestURI)
+	params := mux.Vars(r)
+
+	if params["type"] == "tpp" {
+		for _, item := range listOfMatchesTpp {
+			if strconv.Itoa(item.Id) == params["id"] {
+				json.NewEncoder(w).Encode(item)
+				break
+			}
+		}
+	} else if params["type"] == "fpp" {
+		for _, item := range listOfMatchesFpp {
+			if strconv.Itoa(item.Id) == params["id"] {
+				json.NewEncoder(w).Encode(item)
+				break
+			}
+		}
+	}
 }
 
 func main() {
 	InitServer()
 
-	fmt.Println("Hello problem 10")
+	fmt.Println("Starting server....")
+	fmt.Println("Running at port 8000")
 	router := mux.NewRouter()
 	router.HandleFunc("/teams", GetTeams).Methods("GET")
 	router.HandleFunc("/teams/{id}", GetTeam).Methods("GET")
-	// router.HandleFunc("/points", GetPoints).Methods("GET")
-	// router.HandleFunc("/points/{placement}", GetPoint).Methods("GET")
-	// router.HandleFunc("/matches/{id}", GetMatches).Methods("GET")
-	// router.HandleFunc("/matches", GetMatch).Methods("GET")
+	router.HandleFunc("/points", GetPoints).Methods("GET")
+	router.HandleFunc("/points/{placement}", GetPoint).Methods("GET")
+	router.HandleFunc("/matches/{type}", GetMatches).Methods("GET")
+	router.HandleFunc("/matches/{type}/{id}", GetMatch).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"container/list"
 	"fmt"
 	"os"
 	"sort"
@@ -12,41 +11,41 @@ import (
 
 //Data model for PGI
 type Team struct {
-	id       int
-	name     string
-	regional string
+	Id       int
+	Name     string
+	Regional string
 }
 
 type PointDistribution struct {
-	placement int
-	point     int
+	Placement int
+	Point     int
 }
 
 type Match struct {
-	id                 int
-	matchName          string
-	mapName            string
-	listOfMatchDetails *list.List
+	Id                 int
+	MatchName          string
+	MapName            string
+	ListOfMatchDetails []MatchDetails
 }
 
 /////////////////////////////////////////////////////////////
 type MatchDetails struct {
-	team       Team
-	detail     PointDistribution
-	kill       int
-	totalPoint int
+	Team       Team
+	Detail     PointDistribution
+	Kill       int
+	TotalPoint int
 }
 
 func (dt *MatchDetails) caculatePoint() {
-	dt.totalPoint = dt.detail.point + dt.kill*15
+	dt.TotalPoint = dt.Detail.Point + dt.Kill*15
 }
 
 /////////////////////////////////////////////////////////////
 
 type ResultItem struct {
-	team               Team
-	listOfMatchDetails *list.List
-	totalPoint         int
+	Team               Team
+	ListOfMatchDetails []MatchDetails
+	TotalPoint         int
 }
 
 type ByPoint []ResultItem
@@ -56,7 +55,7 @@ func (this ByPoint) Len() int {
 }
 
 func (this ByPoint) Less(i, j int) bool {
-	return this[i].totalPoint > this[j].totalPoint
+	return this[i].TotalPoint > this[j].TotalPoint
 }
 
 func (this ByPoint) Swap(i, j int) {
@@ -66,10 +65,10 @@ func (this ByPoint) Swap(i, j int) {
 /////////////////////////////////////////////////////////////
 
 //Global data
-var listOfTeam *list.List = list.New()
-var listOfPointDistribution *list.List = list.New()
-var listOfMatchesTpp *list.List = list.New()
-var listOfMatchesFpp *list.List = list.New()
+var listOfTeam []Team = make([]Team, 0)
+var listOfPointDistribution []PointDistribution = make([]PointDistribution, 0)
+var listOfMatchesTpp []Match = make([]Match, 0)
+var listOfMatchesFpp []Match = make([]Match, 0)
 var resultListTpp []ResultItem
 var resultListFpp []ResultItem
 
@@ -78,90 +77,90 @@ const dbName = "pgi.txt"
 //
 
 //Fake data
-func CreateFakeData() {
-	//1. Create teams
-	listOfTeam = list.New()
-	team1 := Team{1, "Team Liquid", "European Qualifier"}
-	team2 := Team{2, "Welcome to South Georgo", "European Qualifier"}
-	team3 := Team{9, "Gen.G Gold", "Korean Qualifier"}
+// func CreateFakeData() {
+// 	//1. Create teams
+// 	listOfTeam = list.New()
+// 	team1 := Team{1, "Team Liquid", "European Qualifier"}
+// 	team2 := Team{2, "Welcome to South Georgo", "European Qualifier"}
+// 	team3 := Team{9, "Gen.G Gold", "Korean Qualifier"}
 
-	listOfTeam.PushBack(team1)
-	listOfTeam.PushBack(team2)
-	listOfTeam.PushBack(team3)
+// 	listOfTeam.PushBack(team1)
+// 	listOfTeam.PushBack(team2)
+// 	listOfTeam.PushBack(team3)
 
-	//2. Create point distributions
-	listOfPointDistribution = list.New()
-	listOfPointDistribution.PushBack(PointDistribution{0, 15})
-	listOfPointDistribution.PushBack(PointDistribution{1, 500})
-	listOfPointDistribution.PushBack(PointDistribution{2, 410})
-	listOfPointDistribution.PushBack(PointDistribution{3, 345})
-	listOfPointDistribution.PushBack(PointDistribution{4, 295})
-	listOfPointDistribution.PushBack(PointDistribution{5, 250})
-	listOfPointDistribution.PushBack(PointDistribution{6, 210})
-	listOfPointDistribution.PushBack(PointDistribution{7, 175})
-	listOfPointDistribution.PushBack(PointDistribution{8, 145})
-	listOfPointDistribution.PushBack(PointDistribution{9, 120})
-	listOfPointDistribution.PushBack(PointDistribution{10, 100})
-	listOfPointDistribution.PushBack(PointDistribution{11, 80})
-	listOfPointDistribution.PushBack(PointDistribution{12, 65})
-	listOfPointDistribution.PushBack(PointDistribution{13, 50})
-	listOfPointDistribution.PushBack(PointDistribution{14, 40})
-	listOfPointDistribution.PushBack(PointDistribution{15, 30})
-	listOfPointDistribution.PushBack(PointDistribution{16, 20})
-	listOfPointDistribution.PushBack(PointDistribution{17, 15})
-	listOfPointDistribution.PushBack(PointDistribution{18, 10})
-	listOfPointDistribution.PushBack(PointDistribution{19, 5})
-	listOfPointDistribution.PushBack(PointDistribution{20, 0})
-	//fmt.Println(*listOfPointDistribution)
+// 	//2. Create point distributions
+// 	listOfPointDistribution = list.New()
+// 	listOfPointDistribution.PushBack(PointDistribution{0, 15})
+// 	listOfPointDistribution.PushBack(PointDistribution{1, 500})
+// 	listOfPointDistribution.PushBack(PointDistribution{2, 410})
+// 	listOfPointDistribution.PushBack(PointDistribution{3, 345})
+// 	listOfPointDistribution.PushBack(PointDistribution{4, 295})
+// 	listOfPointDistribution.PushBack(PointDistribution{5, 250})
+// 	listOfPointDistribution.PushBack(PointDistribution{6, 210})
+// 	listOfPointDistribution.PushBack(PointDistribution{7, 175})
+// 	listOfPointDistribution.PushBack(PointDistribution{8, 145})
+// 	listOfPointDistribution.PushBack(PointDistribution{9, 120})
+// 	listOfPointDistribution.PushBack(PointDistribution{10, 100})
+// 	listOfPointDistribution.PushBack(PointDistribution{11, 80})
+// 	listOfPointDistribution.PushBack(PointDistribution{12, 65})
+// 	listOfPointDistribution.PushBack(PointDistribution{13, 50})
+// 	listOfPointDistribution.PushBack(PointDistribution{14, 40})
+// 	listOfPointDistribution.PushBack(PointDistribution{15, 30})
+// 	listOfPointDistribution.PushBack(PointDistribution{16, 20})
+// 	listOfPointDistribution.PushBack(PointDistribution{17, 15})
+// 	listOfPointDistribution.PushBack(PointDistribution{18, 10})
+// 	listOfPointDistribution.PushBack(PointDistribution{19, 5})
+// 	listOfPointDistribution.PushBack(PointDistribution{20, 0})
+// 	//fmt.Println(*listOfPointDistribution)
 
-	//3. Create matches & match details
-	listOfMatchesTpp = list.New()
+// 	//3. Create matches & match details
+// 	listOfMatchesTpp = list.New()
 
-	//Round 1
-	matchdetail1 := MatchDetails{team1, PointDistribution{3, 345}, 7, 0}
-	matchdetail1.caculatePoint()
-	matchdetail2 := MatchDetails{team2, PointDistribution{2, 410}, 2, 0}
-	matchdetail2.caculatePoint()
-	matchdetail3 := MatchDetails{team3, PointDistribution{1, 500}, 4, 0}
-	matchdetail3.caculatePoint()
-	//fmt.Println(matchdetail1)
-	match1 := Match{1, "Round 1", "Erangel", nil}
-	match1.listOfMatchDetails = list.New()
-	match1.listOfMatchDetails.PushBack(matchdetail1)
-	match1.listOfMatchDetails.PushBack(matchdetail2)
-	match1.listOfMatchDetails.PushBack(matchdetail3)
+// 	//Round 1
+// 	matchdetail1 := MatchDetails{team1, PointDistribution{3, 345}, 7, 0}
+// 	matchdetail1.caculatePoint()
+// 	matchdetail2 := MatchDetails{team2, PointDistribution{2, 410}, 2, 0}
+// 	matchdetail2.caculatePoint()
+// 	matchdetail3 := MatchDetails{team3, PointDistribution{1, 500}, 4, 0}
+// 	matchdetail3.caculatePoint()
+// 	//fmt.Println(matchdetail1)
+// 	match1 := Match{1, "Round 1", "Erangel", nil}
+// 	match1.listOfMatchDetails = list.New()
+// 	match1.listOfMatchDetails.PushBack(matchdetail1)
+// 	match1.listOfMatchDetails.PushBack(matchdetail2)
+// 	match1.listOfMatchDetails.PushBack(matchdetail3)
 
-	//Round 2
-	matchdetail4 := MatchDetails{team1, PointDistribution{2, 410}, 3, 0}
-	matchdetail4.caculatePoint()
-	matchdetail5 := MatchDetails{team2, PointDistribution{1, 500}, 5, 0}
-	matchdetail5.caculatePoint()
-	matchdetail6 := MatchDetails{team3, PointDistribution{3, 345}, 2, 0}
-	matchdetail6.caculatePoint()
-	match2 := Match{2, "Round 2", "Erangel", nil}
-	match2.listOfMatchDetails = list.New()
-	match2.listOfMatchDetails.PushBack(matchdetail4)
-	match2.listOfMatchDetails.PushBack(matchdetail5)
-	match2.listOfMatchDetails.PushBack(matchdetail6)
+// 	//Round 2
+// 	matchdetail4 := MatchDetails{team1, PointDistribution{2, 410}, 3, 0}
+// 	matchdetail4.caculatePoint()
+// 	matchdetail5 := MatchDetails{team2, PointDistribution{1, 500}, 5, 0}
+// 	matchdetail5.caculatePoint()
+// 	matchdetail6 := MatchDetails{team3, PointDistribution{3, 345}, 2, 0}
+// 	matchdetail6.caculatePoint()
+// 	match2 := Match{2, "Round 2", "Erangel", nil}
+// 	match2.listOfMatchDetails = list.New()
+// 	match2.listOfMatchDetails.PushBack(matchdetail4)
+// 	match2.listOfMatchDetails.PushBack(matchdetail5)
+// 	match2.listOfMatchDetails.PushBack(matchdetail6)
 
-	//Round 3
-	matchdetail7 := MatchDetails{team1, PointDistribution{3, 345}, 5, 0}
-	matchdetail7.caculatePoint()
-	matchdetail8 := MatchDetails{team2, PointDistribution{1, 500}, 7, 0}
-	matchdetail8.caculatePoint()
-	matchdetail9 := MatchDetails{team3, PointDistribution{2, 410}, 1, 0}
-	matchdetail9.caculatePoint()
-	match3 := Match{3, "Round 3", "Erangel", nil}
-	match3.listOfMatchDetails = list.New()
-	match3.listOfMatchDetails.PushBack(matchdetail7)
-	match3.listOfMatchDetails.PushBack(matchdetail8)
-	match3.listOfMatchDetails.PushBack(matchdetail9)
+// 	//Round 3
+// 	matchdetail7 := MatchDetails{team1, PointDistribution{3, 345}, 5, 0}
+// 	matchdetail7.caculatePoint()
+// 	matchdetail8 := MatchDetails{team2, PointDistribution{1, 500}, 7, 0}
+// 	matchdetail8.caculatePoint()
+// 	matchdetail9 := MatchDetails{team3, PointDistribution{2, 410}, 1, 0}
+// 	matchdetail9.caculatePoint()
+// 	match3 := Match{3, "Round 3", "Erangel", nil}
+// 	match3.listOfMatchDetails = list.New()
+// 	match3.listOfMatchDetails.PushBack(matchdetail7)
+// 	match3.listOfMatchDetails.PushBack(matchdetail8)
+// 	match3.listOfMatchDetails.PushBack(matchdetail9)
 
-	//Add matches
-	listOfMatchesTpp.PushBack(match1)
-	listOfMatchesTpp.PushBack(match2)
-	listOfMatchesTpp.PushBack(match3)
-}
+// 	//Add matches
+// 	listOfMatchesTpp.PushBack(match1)
+// 	listOfMatchesTpp.PushBack(match2)
+// 	listOfMatchesTpp.PushBack(match3)
+// }
 
 func MakeTeam(id int, name string, regional string) Team {
 	return Team{id, name, regional}
@@ -172,9 +171,9 @@ func MakePointDistribution(placement int, point int) PointDistribution {
 }
 
 func SearchTeam(id int) Team {
-	for index := listOfTeam.Front(); index != nil; index = index.Next() {
-		if id == index.Value.(Team).id {
-			return index.Value.(Team)
+	for _, item := range listOfTeam {
+		if id == item.Id {
+			return item
 		}
 	}
 
@@ -182,9 +181,9 @@ func SearchTeam(id int) Team {
 }
 
 func SearchPointDistribution(placement int) PointDistribution {
-	for index := listOfPointDistribution.Front(); index != nil; index = index.Next() {
-		if placement == index.Value.(PointDistribution).placement {
-			return index.Value.(PointDistribution)
+	for _, item := range listOfPointDistribution {
+		if placement == item.Placement {
+			return item
 		}
 	}
 
@@ -231,7 +230,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					listOfTeam.PushBack(MakeTeam(id,
+					listOfTeam = append(listOfTeam, MakeTeam(id,
 						strings.TrimSpace(tokens[1]),
 						strings.TrimSpace(tokens[2])))
 
@@ -244,7 +243,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					listOfPointDistribution.PushBack(MakePointDistribution(placement, point))
+					listOfPointDistribution = append(listOfPointDistribution, MakePointDistribution(placement, point))
 
 				case 3:
 					var tokens = strings.Split(str, ",")
@@ -256,7 +255,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					match := Match{id, tokens[1], tokens[2], list.New()}
+					match := Match{id, tokens[1], tokens[2], make([]MatchDetails, 0)}
 
 					for i := 0; i < (tokensLen-3)/3; i++ {
 						teamid, err := strconv.Atoi(strings.TrimSpace(tokens[3+(i*3)]))
@@ -268,10 +267,10 @@ func LoadData() {
 						matchdetail := MatchDetails{SearchTeam(teamid), SearchPointDistribution(placement), kill, 0}
 						matchdetail.caculatePoint()
 
-						match.listOfMatchDetails.PushBack(matchdetail)
+						match.ListOfMatchDetails = append(match.ListOfMatchDetails, matchdetail)
 					}
 
-					listOfMatchesTpp.PushBack(match)
+					listOfMatchesTpp = append(listOfMatchesTpp, match)
 
 				case 4:
 					var tokens = strings.Split(str, ",")
@@ -283,7 +282,7 @@ func LoadData() {
 						fmt.Println(err)
 					}
 
-					match := Match{id, tokens[1], tokens[2], list.New()}
+					match := Match{id, tokens[1], tokens[2], make([]MatchDetails, 0)}
 
 					for i := 0; i < (tokensLen-3)/3; i++ {
 						teamid, err := strconv.Atoi(strings.TrimSpace(tokens[3+(i*3)]))
@@ -295,10 +294,10 @@ func LoadData() {
 						matchdetail := MatchDetails{SearchTeam(teamid), SearchPointDistribution(placement), kill, 0}
 						matchdetail.caculatePoint()
 
-						match.listOfMatchDetails.PushBack(matchdetail)
+						match.ListOfMatchDetails = append(match.ListOfMatchDetails, matchdetail)
 					}
 
-					listOfMatchesFpp.PushBack(match)
+					listOfMatchesFpp = append(listOfMatchesFpp, match)
 
 				default:
 					fmt.Printf("Unknown section")
@@ -315,38 +314,32 @@ func CalculatePGI() {
 	resultListTpp = make([]ResultItem, 0)
 
 	//Filter team result TPP
-	for item := listOfTeam.Front(); item != nil; item = item.Next() {
-		var data = item.Value.(Team)
-		resultItem := ResultItem{data, list.New(), 0}
+	for _, team := range listOfTeam {
+		resultItem := ResultItem{team, make([]MatchDetails, 0), 0}
 
 		//Each team we get all match details of each
-		for inner := listOfMatchesTpp.Front(); inner != nil; inner = inner.Next() {
-			var list = inner.Value.(Match).listOfMatchDetails
+		for _, item := range listOfMatchesTpp {
 			//Add detail of specific match
-			for i := list.Front(); i != nil; i = i.Next() {
-				var detail = i.Value.(MatchDetails)
-				if detail.team.id == data.id {
-					resultItem.listOfMatchDetails.PushBack(detail)
-					resultItem.totalPoint += detail.detail.point + detail.kill*15
+			for _, detail := range item.ListOfMatchDetails {
+				if detail.Team.Id == team.Id {
+					resultItem.ListOfMatchDetails = append(resultItem.ListOfMatchDetails, detail)
+					resultItem.TotalPoint += detail.Detail.Point + detail.Kill*15
 				}
 			}
 		}
 		resultListTpp = append(resultListTpp, resultItem)
 	}
 
-	for item := listOfTeam.Front(); item != nil; item = item.Next() {
-		var data = item.Value.(Team)
-		resultItem := ResultItem{data, list.New(), 0}
+	for _, team := range listOfTeam {
+		resultItem := ResultItem{team, make([]MatchDetails, 0), 0}
 
 		//Each team we get all match details of each
-		for inner := listOfMatchesFpp.Front(); inner != nil; inner = inner.Next() {
-			var list = inner.Value.(Match).listOfMatchDetails
+		for _, item := range listOfMatchesFpp {
 			//Add detail of specific match
-			for i := list.Front(); i != nil; i = i.Next() {
-				var detail = i.Value.(MatchDetails)
-				if detail.team.id == data.id {
-					resultItem.listOfMatchDetails.PushBack(detail)
-					resultItem.totalPoint += detail.detail.point + detail.kill*15
+			for _, detail := range item.ListOfMatchDetails {
+				if detail.Team.Id == team.Id {
+					resultItem.ListOfMatchDetails = append(resultItem.ListOfMatchDetails, detail)
+					resultItem.TotalPoint += detail.Detail.Point + detail.Kill*15
 				}
 			}
 		}
@@ -364,17 +357,17 @@ func CalculatePGI() {
 func DisplayMatch(match Match) string {
 	var result = ""
 
-	result = "ID:         " + strconv.Itoa(match.id) + "\n" +
-		"Match Name: " + match.matchName + "\n" +
-		"Map:        " + match.mapName
+	result = "ID:         " + strconv.Itoa(match.Id) + "\n" +
+		"Match Name: " + match.MatchName + "\n" +
+		"Map:        " + match.MapName
 
 	result += "\n\tDetails: \n"
 
-	for inner := match.listOfMatchDetails.Front(); inner != nil; inner = inner.Next() {
-		result += inner.Value.(MatchDetails).team.name + ", " +
-			inner.Value.(MatchDetails).team.regional + ", " +
-			strconv.Itoa(inner.Value.(MatchDetails).kill) + ", " +
-			strconv.Itoa(inner.Value.(MatchDetails).totalPoint) + "\n"
+	for _, item := range match.ListOfMatchDetails {
+		result += item.Team.Name + ", " +
+			item.Team.Regional + ", " +
+			strconv.Itoa(item.Kill) + ", " +
+			strconv.Itoa(item.TotalPoint) + "\n"
 	}
 
 	return result
@@ -384,13 +377,12 @@ func DisplayResultItems(list []ResultItem) string {
 	var result = ""
 	var start = 1
 	for _, item := range list {
-		result += strconv.Itoa(start) + ". " + item.team.name + "\t\t"
-		for inner := item.listOfMatchDetails.Front(); inner != nil; inner = inner.Next() {
-			var data = inner.Value.(MatchDetails)
-			result += "[" + strconv.Itoa(data.detail.placement) + ", " + strconv.Itoa(data.kill) + "]" + " - "
+		result += strconv.Itoa(start) + ". " + item.Team.Name + "\t\t"
+		for _, data := range item.ListOfMatchDetails {
+			result += "[" + strconv.Itoa(data.Detail.Placement) + ", " + strconv.Itoa(data.Kill) + "]" + " - "
 
 		}
-		result += strconv.Itoa(item.totalPoint) + "\n"
+		result += strconv.Itoa(item.TotalPoint) + "\n"
 
 		start++
 	}
@@ -399,10 +391,10 @@ func DisplayResultItems(list []ResultItem) string {
 
 func DisplayAllTeams() {
 	if listOfTeam != nil {
-		fmt.Println("Total team: ", listOfTeam.Len())
+		fmt.Println("Total team: ", len(listOfTeam))
 
-		for index := listOfTeam.Front(); index != nil; index = index.Next() {
-			fmt.Println(index.Value.(Team).id, " - ", index.Value.(Team).name, " - ", index.Value.(Team).regional)
+		for _, item := range listOfTeam {
+			fmt.Println(item.Id, " - ", item.Name, " - ", item.Regional)
 		}
 
 		fmt.Print("\n")
@@ -411,10 +403,10 @@ func DisplayAllTeams() {
 
 func DisplayPointDistribution() {
 	if listOfPointDistribution != nil {
-		fmt.Println("Total point distribution: ", listOfPointDistribution.Len())
+		fmt.Println("Total point distribution: ", len(listOfPointDistribution))
 
-		for index := listOfPointDistribution.Front(); index != nil; index = index.Next() {
-			fmt.Println(index.Value.(PointDistribution).placement, " - ", index.Value.(PointDistribution).point)
+		for _, item := range listOfPointDistribution {
+			fmt.Println(item.Placement, " - ", item.Point)
 		}
 		fmt.Print("\n")
 	}
@@ -422,10 +414,10 @@ func DisplayPointDistribution() {
 
 func DisplayMatches() {
 	if listOfMatchesTpp != nil {
-		fmt.Println("Total matches: ", listOfMatchesTpp.Len())
+		fmt.Println("Total matches: ", len(listOfMatchesTpp))
 
-		for index := listOfMatchesTpp.Front(); index != nil; index = index.Next() {
-			fmt.Print(DisplayMatch(index.Value.(Match)))
+		for _, item := range listOfMatchesTpp {
+			fmt.Print(DisplayMatch(item))
 			fmt.Print("\n")
 		}
 	}
