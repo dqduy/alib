@@ -3,107 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dqduy/pgi"
 	"io/ioutil"
 	"net/http"
 	"sort"
 	"strconv"
 )
 
-//Data model for PGI
-type Team struct {
-	Id       int
-	Name     string
-	Regional string
-}
-
-type PointDistribution struct {
-	Placement int
-	Point     int
-}
-
-type Match struct {
-	Id                 int
-	MatchName          string
-	MapName            string
-	ListOfMatchDetails []MatchDetails
-}
-
 /////////////////////////////////////////////////////////////
-type MatchDetails struct {
-	Team       Team
-	Detail     PointDistribution
-	Kill       int
-	TotalPoint int
-}
-
-func (dt *MatchDetails) caculatePoint() {
-	dt.TotalPoint = dt.Detail.Point + dt.Kill*15
-}
-
-/////////////////////////////////////////////////////////////
-
-type ResultItem struct {
-	Team               Team
-	ListOfMatchDetails []MatchDetails
-	TotalPoint         int
-}
-
-type ByPoint []ResultItem
-
-func (this ByPoint) Len() int {
-	return len(this)
-}
-
-func (this ByPoint) Less(i, j int) bool {
-	return this[i].TotalPoint > this[j].TotalPoint
-}
-
-func (this ByPoint) Swap(i, j int) {
-	this[i], this[j] = this[j], this[i]
-}
-
-/////////////////////////////////////////////////////////////
-
-//Global data
-var listOfTeam []Team = make([]Team, 0)
-var listOfPointDistribution []PointDistribution = make([]PointDistribution, 0)
-var listOfMatchesTpp []Match = make([]Match, 0)
-var listOfMatchesFpp []Match = make([]Match, 0)
-var resultListTpp []ResultItem
-var resultListFpp []ResultItem
-
-const dbName = "pgi.txt"
+//Global var
 const urlServer = "http://127.0.0.1:8000"
 
-/////////////////////////////////////////////////////////////
-//Helper function
-func MakeTeam(id int, name string, regional string) Team {
-	return Team{id, name, regional}
-}
-
-func MakePointDistribution(placement int, point int) PointDistribution {
-	return PointDistribution{placement, point}
-}
-
-func SearchTeam(id int) Team {
-	for _, item := range listOfTeam {
-		if id == item.Id {
-			return item
-		}
-	}
-
-	return Team{0, "", ""}
-}
-
-func SearchPointDistribution(placement int) PointDistribution {
-	for _, item := range listOfPointDistribution {
-		if placement == item.Placement {
-			return item
-		}
-	}
-
-	return PointDistribution{0, 15}
-}
+var resultListTpp []pgi.ResultItem
+var resultListFpp []pgi.ResultItem
 
 /////////////////////////////////////////////////////////////
 
@@ -124,7 +36,7 @@ func LoadTeams() {
 		fmt.Println(err)
 	}
 
-	err1 := json.Unmarshal([]byte(data), &listOfTeam)
+	err1 := json.Unmarshal([]byte(data), &pgi.ListOfTeam)
 
 	if err1 != nil {
 		fmt.Println(err)
@@ -147,7 +59,7 @@ func LoadPointDistributions() {
 		fmt.Println(err)
 	}
 
-	err1 := json.Unmarshal([]byte(data), &listOfPointDistribution)
+	err1 := json.Unmarshal([]byte(data), &pgi.ListOfPointDistribution)
 
 	if err1 != nil {
 		fmt.Println(err)
@@ -171,7 +83,7 @@ func LoadMatches() {
 		fmt.Println(err)
 	}
 
-	err1 := json.Unmarshal([]byte(data), &listOfMatchesTpp)
+	err1 := json.Unmarshal([]byte(data), &pgi.ListOfMatchesTpp)
 
 	if err1 != nil {
 		fmt.Println(err)
@@ -192,7 +104,7 @@ func LoadMatches() {
 		fmt.Println(err)
 	}
 
-	err3 := json.Unmarshal([]byte(data), &listOfMatchesFpp)
+	err3 := json.Unmarshal([]byte(data), &pgi.ListOfMatchesFpp)
 
 	if err3 != nil {
 		fmt.Println(err)
@@ -211,14 +123,14 @@ func LoadData() {
 
 //2. Calculate table
 func CalculatePGI() {
-	resultListTpp = make([]ResultItem, 0)
+	resultListTpp = make([]pgi.ResultItem, 0)
 
 	//Filter team result TPP
-	for _, team := range listOfTeam {
-		resultItem := ResultItem{team, make([]MatchDetails, 0), 0}
+	for _, team := range pgi.ListOfTeam {
+		resultItem := pgi.ResultItem{team, make([]pgi.MatchDetails, 0), 0}
 
 		//Each team we get all match details of each
-		for _, item := range listOfMatchesTpp {
+		for _, item := range pgi.ListOfMatchesTpp {
 			//Add detail of specific match
 			for _, detail := range item.ListOfMatchDetails {
 				if detail.Team.Id == team.Id {
@@ -230,11 +142,12 @@ func CalculatePGI() {
 		resultListTpp = append(resultListTpp, resultItem)
 	}
 
-	for _, team := range listOfTeam {
-		resultItem := ResultItem{team, make([]MatchDetails, 0), 0}
+	//Filter team result FPP
+	for _, team := range pgi.ListOfTeam {
+		resultItem := pgi.ResultItem{team, make([]pgi.MatchDetails, 0), 0}
 
 		//Each team we get all match details of each
-		for _, item := range listOfMatchesFpp {
+		for _, item := range pgi.ListOfMatchesFpp {
 			//Add detail of specific match
 			for _, detail := range item.ListOfMatchDetails {
 				if detail.Team.Id == team.Id {
@@ -249,31 +162,12 @@ func CalculatePGI() {
 	//Sort result list
 	//1. Point
 	//2. if two point's team is equal, we compare kill
-	sort.Sort(ByPoint(resultListTpp))
-	sort.Sort(ByPoint(resultListFpp))
+	sort.Sort(pgi.ByPoint(resultListTpp))
+	sort.Sort(pgi.ByPoint(resultListFpp))
 }
 
 //3. Display section
-func DisplayMatch(match Match) string {
-	var result = ""
-
-	result = "ID:         " + strconv.Itoa(match.Id) + "\n" +
-		"Match Name: " + match.MatchName + "\n" +
-		"Map:        " + match.MapName
-
-	result += "\n\tDetails: \n"
-
-	for _, item := range match.ListOfMatchDetails {
-		result += item.Team.Name + ", " +
-			item.Team.Regional + ", " +
-			strconv.Itoa(item.Kill) + ", " +
-			strconv.Itoa(item.TotalPoint) + "\n"
-	}
-
-	return result
-}
-
-func DisplayResultItems(list []ResultItem) string {
+func DisplayResultItems(list []pgi.ResultItem) string {
 	var result = ""
 	var start = 1
 	for _, item := range list {
@@ -289,51 +183,8 @@ func DisplayResultItems(list []ResultItem) string {
 	return result
 }
 
-func DisplayAllTeams() {
-	if listOfTeam != nil {
-		fmt.Println("Total team: ", len(listOfTeam))
-
-		for _, item := range listOfTeam {
-			fmt.Println(item.Id, " - ", item.Name, " - ", item.Regional)
-		}
-
-		fmt.Print("\n")
-	}
-}
-
-func DisplayPointDistribution() {
-	if listOfPointDistribution != nil {
-		fmt.Println("Total point distribution: ", len(listOfPointDistribution))
-
-		for _, item := range listOfPointDistribution {
-			fmt.Println(item.Placement, " - ", item.Point)
-		}
-		fmt.Print("\n")
-	}
-}
-
-func DisplayMatches() {
-	if listOfMatchesTpp != nil {
-		fmt.Println("Total matches: ", len(listOfMatchesTpp))
-
-		for _, item := range listOfMatchesTpp {
-			fmt.Print(DisplayMatch(item))
-			fmt.Print("\n")
-		}
-	}
-}
-
 func DisplayAll() {
-	//1. Print teams
-	//DisplayAllTeams()
-
-	//2. Print point distributions
-	//DisplayPointDistribution()
-
-	//3. Print matches
-	//DisplayMatches()
-
-	//4. Print result items
+	//Print result items
 	fmt.Println("PUBG Global Invitational 2018")
 	fmt.Println("=============================\n")
 	fmt.Println("TPP:")
