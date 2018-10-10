@@ -1,12 +1,12 @@
 # Problem 10
 
-## Golang Examples
+## Code snippets
 
 ## Build tools
-1. golang
+1. All languages
 
 ## Content
-    - Golang examples
+    
 
 ## Tech Stack
 
