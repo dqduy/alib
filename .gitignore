@@ -1,3 +1,16 @@
+*.out
+*.exe
+*.class
+
+#################
+## problem 8
+#################
+libs/
+generated/
+obj/
+.gradle/
+.idea/
+.vscode
 #################
 ## Eclipse
 #################
@@ -10,7 +23,7 @@ tmp/
 *.tmp
 *.bak
 *.swp
-*~.nib
+*~.externalToolBuildersb
 local.properties
 .classpath
 .settings/

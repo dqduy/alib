@@ -1,72 +1,112 @@
 #include "ArrayList.h"
 
-ArrayList::ArrayList(int maxLength) 
+void ArrayList::increaseSpace(int space)
 {
-	list = new int[maxLength];
-	this->maxLength = maxLength;
-	this->cursor = 0;
+    int* tmp = new int[capacity + space];
+
+    for(int index = 0; index < totalItems; ++index)
+        tmp[index] = list[index];
+
+    delete[] list;
+    list = tmp;
+    capacity += space;
+}
+
+void ArrayList::decreaseSpace(int space) 
+{
+}
+
+ArrayList::ArrayList() 
+{
+    capacity    = 5;
+    totalItems  = 0;
+    blockSize   = 3;
+    list = new int[capacity];
+}
+
+ArrayList::ArrayList(int64_t capacity) 
+{
+    this->capacity    = capacity;
+    this->totalItems  = 0;
+    this->blockSize   = 124;
+    list = new int[this->capacity];
+    
+}
+
+ArrayList::ArrayList(ArrayList& obj) 
+{
 }
 
 bool ArrayList::isEmpty()
 {
-	if(cursor == 0) return true;
-	else return false;
+    if(totalItems == 0) return true;
+    else return false;
 }
 
 bool ArrayList::isFull()
 {
-	if(cursor == maxLength) return true;
-	else return false;
+    if(totalItems == capacity) return true;
+    else return false;
 }
 
 void ArrayList::clear()
 {
-	delete[] list;
-	cursor = 0;
+    delete[] list;
+    totalItems = 0;
+    list = new int[capacity];
 }
 
-void ArrayList::add(int location, int item)
+void ArrayList::insert(int64_t location, int item)
 {
-	if(!isFull()) 
-	{
-		if(location >= 1 && location <= cursor + 1)
-		{
-			for(int i = cursor; i> location-1; i--)
-			{
-				list[i] = list[i-1];
-			}
-			
-			list[location-1] = item;
-			cursor++;
-		}
-	}
+}
+
+void ArrayList::add(ArrayList& obj)
+{
 }
 
 void ArrayList::add(int item)
 {
-	if(!isFull())
-	{
-		list[cursor] = item;
-		cursor++;
-	}
+    if(!isFull())
+    {
+        list[totalItems] = item;
+        totalItems++;  
+    }
+
+    if(totalItems == capacity)
+        increaseSpace(blockSize);
 }
 
-void ArrayList::remove(int location)
+void ArrayList::remove(int64_t location)
 {
-	
-} 
- 
-int ArrayList::indexOf(int item)
-{
-	return 0;
-} 
- 
-int ArrayList::get(int location)
-{
-	return list[location-1];
+    if(location >= 0 && location < totalItems)
+    {
+        for(int index = location; index <= totalItems - 2; ++index)
+            list[index] = list[index + 1];
+        totalItems--;
+    }
+
+    if(totalItems == 0)
+        decreaseSpace(capacity);
+
 } 
 
-int ArrayList::size()
+int64_t ArrayList::indexOf(int item)
 {
-	return cursor;
+    for(int index = 0; index < totalItems; ++index) 
+    {
+        if(list[index] == item)
+            return index;
+    }
+
+    return -1;
+} 
+
+int ArrayList::get(int64_t location)
+{
+    return list[location];
+} 
+
+int64_t ArrayList::size()
+{
+    return totalItems;
 }

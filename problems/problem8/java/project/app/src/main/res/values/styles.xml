@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
+    <style name="ImageDetailActionBar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:background">#7C4DFF</item>
+    </style>
+    <style name="myActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="android:layout_width">32px</item>
+        <item name="android:layout_height">32px</item>
+    </style>
+</resources>

@@ -1,2 +1,1 @@
-# datastructures
-Learn many data structures in the world
+﻿# Discover Computer SystemLearn and apply new lessons in the world to my life## List of problems| ID        | Name           | Status  | Start Date | Completed date| ------------- |-------------| -----| ----| ----|| 1 | Implement ArrayList | Completed || 2 | Extract code point (utf-8) from file | Completed || 3 | Bookmark manager in console      | Progress || 4 | Introduction SDL 2      | Completed || 5 |       | || 6 |       | || 7 |       | || 8 |       | || 9 | PGI app with Golang      | Completed | 18/Sep| 19/Sep

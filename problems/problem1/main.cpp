@@ -1,17 +1,29 @@
 using namespace std;
 
 #include<iostream>
-#include "lib/ArrayList.cpp"
-#include "util/ListUtil.cpp"
-
+#include "../../lib/ArrayList.h"
+#include "../../lib/util/ListUtil.h"
 
 int main()
 {
-    ArrayList a(6);	
+    ArrayList a;
     ListUtil::readList(&a);
     ListUtil::printList(&a);
-	
-    //Test forr update program for Git over GL
-        	
+    cout << "Size of list: " << a.size() << endl;
+    a.clear();
+
+    cout << "\n";
+
+    ListUtil::readListWithIncrease(&a);
+    ListUtil::printList(&a);
+    cout << "Size of list: " << a.size() << endl;
+
+    cout << "\n";  
+
+    a.remove(a.indexOf(12));
+    ListUtil::printList(&a);
+    cout << "Size of list: " << a.size() << endl;
+
+
     return 0;
 }
